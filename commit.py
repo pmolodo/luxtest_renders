@@ -86,10 +86,20 @@ def commit_renders(message="", extra_paths: Iterable[str] = ()):
     # custom template we provide
 
     commit_args = ["commit", "-a"]
-    # if extra_paths are relative, assume they're relative to cwd (so
-    # user can make use of shell completion)
-    cwd = os.getcwd()
-    commit_args.extend(os.path.join(cwd, p) for p in extra_paths)
+
+    extra_paths = list(extra_paths)
+    if extra_paths:
+        # if there are extra paths, we can't combine with "-a"... so manually
+        # add the extra paths, and any modified files
+        # we also can't combine paths with "add -u"
+        add_args = ["add"]
+        # if extra_paths are relative, assume they're relative to cwd (so
+        # user can make use of shell completion)
+        cwd = os.getcwd()
+        add_args.extend(os.path.join(cwd, p) for p in extra_paths)
+        git(RENDERS_REPO, add_args)
+    else:
+        commit_args.append("-u")
 
     if message:
         # we can compute the full message + commit immediately
