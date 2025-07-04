@@ -20,7 +20,14 @@ THIS_FILE = os.path.abspath(inspect.getsourcefile(lambda: None) or __file__)
 THIS_DIR = os.path.dirname(THIS_FILE)
 
 RENDERS_REPO = THIS_DIR
-LUXTEST_REPO = os.path.dirname(THIS_DIR)
+
+PARENT_DIR = os.path.dirname(THIS_DIR)
+if os.path.basename(PARENT_DIR) == "luxtest":
+    LUXTEST_REPO = PARENT_DIR
+else:
+    LUXTEST_REPO = os.path.join(PARENT_DIR, "luxtest")
+    if not os.path.isdir(LUXTEST_REPO):
+        raise RuntimeError("could not find luxtest repo")
 
 DEFAULT_USD_REPO = os.path.join(os.path.dirname(LUXTEST_REPO), "usd-ci", "USD")
 USD_REPO = os.environ.get("USD_ROOT", DEFAULT_USD_REPO)
